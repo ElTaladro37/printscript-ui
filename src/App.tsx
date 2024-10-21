@@ -46,4 +46,7 @@ const _App = withAuthenticationRequired(
     }
 );
 
+// To enable Auth0 integration change the following line
 export default App;
+// for this one:
+// export default withAuthenticationRequired(App);
