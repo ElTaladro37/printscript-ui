@@ -119,8 +119,8 @@ export class FakeSnippetOperations implements SnippetOperations {
     })
   }
 
-  async getTestCases(): Promise<TestCase[]> {
-    const response = await axios.get(`http://localhost:8082/snippet/test`, {
+  async getTestCases(snippetId: String): Promise<TestCase[]> {
+    const response = await axios.get(`http://localhost:8082/snippet/test${snippetId}`, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }

@@ -67,7 +67,7 @@ export const useShareSnippet = () => {
 export const useGetTestCases = (snippetId: string) => {
   const snippetOperations = useSnippetsOperations()
 
-  return useQuery<TestCase[] | undefined, Error>(['testCases'], async () => (await snippetOperations).getTestCases(), {});
+  return useQuery<TestCase[] | undefined, Error>(['testCases'], async () => (await snippetOperations).getTestCases(snippetId), {});
 };
 
 
