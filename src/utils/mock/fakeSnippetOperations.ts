@@ -7,29 +7,56 @@ import {TestCase} from "../../types/TestCase.ts";
 import {TestCaseResult} from "../queries.tsx";
 import {FileType} from "../../types/FileType.ts";
 import {Rule} from "../../types/Rule.ts";
-
+import axios from 'axios';
 const DELAY: number = 1000
 
 export class FakeSnippetOperations implements SnippetOperations {
   private readonly fakeStore = new FakeSnippetStore()
+  private readonly token: string;
 
-  constructor() {
+  constructor(token: string) {
     autoBind(this)
+    this.token = token;
   }
 
-  createSnippet(createSnippet: CreateSnippet): Promise<Snippet> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.createSnippet(createSnippet)), DELAY)
-    })
+  async createSnippet(createSnippet: CreateSnippet): Promise<Snippet> {
+    const data = {
+      name: createSnippet.name,
+      description: "description",
+      language: createSnippet.language,
+      version: "1.1",
+      snippetFile: createSnippet.content
+    };
+
+    const response = await axios.post('http://localhost:8082/snippet/text', data, {
+      headers: {
+        Authorization: `Bearer ${this.token }`
+      }
+    });
+
+    console.log(response.data)
+    return response.data;
   }
 
-  getSnippetById(id: string): Promise<Snippet | undefined> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.getSnippetById(id)), DELAY)
-    })
+  async getSnippetById(id: string): Promise<Snippet | undefined> {
+    // return new Promise(resolve => {
+    //   setTimeout(() => resolve(this.fakeStore.getSnippetById(id)), DELAY)
+    // })
+
+    const response = await axios.get(`http://localhost:8082/snippet/${id}`, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+
+    return response.data;
   }
 
   listSnippetDescriptors(page: number,pageSize: number): Promise<PaginatedSnippets> {
+    // const response = await axios.post('http://localhost:8082/snippet/text', {
+    //
+    // })
+
     const response: PaginatedSnippets = {
       page: page,
       page_size: pageSize,
@@ -42,10 +69,22 @@ export class FakeSnippetOperations implements SnippetOperations {
     })
   }
 
-  updateSnippetById(id: string, updateSnippet: UpdateSnippet): Promise<Snippet> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.updateSnippet(id, updateSnippet)), DELAY)
-    })
+  async updateSnippetById(id: string, updateSnippet: UpdateSnippet): Promise<Snippet> {
+    const data = {
+      snippetFile: updateSnippet.content,
+      name: updateSnippet.name,
+      language: updateSnippet.language?? "printScript",
+      version: updateSnippet.extension?? "1.1",
+      description: "esto nose que es"
+    }
+
+    const response = await axios.put(`http://localhost:8082/snippet/${id}/text`, data, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+
+    return response.data;
   }
 
   getUserFriends(name: string = "", page: number = 1, pageSize: number = 10): Promise<PaginatedUsers> {
@@ -54,8 +93,9 @@ export class FakeSnippetOperations implements SnippetOperations {
     })
   }
 
-  shareSnippet(snippetId: string): Promise<Snippet> {
+  shareSnippet(snippetId: string, userId: string): Promise<Snippet> {
     return new Promise(resolve => {
+      console.log(userId)
       // @ts-expect-error, it will always find it in the fake store
       setTimeout(() => resolve(this.fakeStore.getSnippetById(snippetId)), DELAY)
     })
@@ -79,34 +119,90 @@ export class FakeSnippetOperations implements SnippetOperations {
     })
   }
 
-  getTestCases(): Promise<TestCase[]> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.getTestCases()), DELAY)
-    })
+  async getTestCases(): Promise<TestCase[]> {
+    const response = await axios.get(`http://localhost:8082/snippet/test`, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+
+    return response.data;
   }
 
-  postTestCase(testCase: TestCase): Promise<TestCase> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.postTestCase(testCase)), DELAY)
-    })
+  async postTestCase(testCase: TestCase): Promise<TestCase> {
+    const id = testCase.id
+
+    const existance = await axios.get(`http://localhost:8082/snippet/test/${id}`, {
+        headers: {
+            Authorization: `Bearer ${this.token}`
+        }
+    });
+
+    if (existance.data){
+      const data = {
+        id: id,
+        name: testCase.name,
+        input: testCase.input,
+        output: testCase.output
+      }
+
+      const response = await axios.put(`http://localhost:8082/snippet/test}`, data, {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      });
+
+      return response.data;
+    }
+    const data = {
+      name: testCase.name,
+      input: testCase.input,
+      output: testCase.output
+    }
+
+    const response = await axios.post(`http://localhost:8082/snippet/test}`, data, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+
+    return response.data;
   }
 
-  removeTestCase(id: string): Promise<string> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.removeTestCase(id)), DELAY)
-    })
+  async removeTestCase(id: string): Promise<string> {
+    const response = await axios.delete(`http://localhost:8082/snippet/${id}`, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+
+    return response.data;
   }
 
-  testSnippet(): Promise<TestCaseResult> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.testSnippet()), DELAY)
-    })
+  async testSnippet(test: TestCase): Promise<TestCaseResult> {
+    const data = {
+      id: test.id,
+      input: test.input,
+      output: test.output
+    }
+
+    const response = await axios.post(`http://localhost:8082/snippet/test}`, data, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+
+    return response.data;
   }
 
-  deleteSnippet(id: string): Promise<string> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.deleteSnippet(id)), DELAY)
-    })
+  async deleteSnippet(id: string): Promise<string> {
+    const response = await axios.delete(`http://localhost:8082/snippet/${id}`, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+
+    return response.data;
   }
 
   getFileTypes(): Promise<FileType[]> {

@@ -8,7 +8,7 @@ import {Rule} from "../../types/Rule.ts";
 
 const INITIAL_SNIPPETS: Snippet[] = [
   {
-    id: '9af91631-cdfc-4341-9b8e-3694e5cb3672',
+    id: 'b8261834-1b60-45ca-a2d1-86e9ca279b30',
     name: 'Super Snippet',
     content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
     compliance: 'pending',
@@ -140,7 +140,7 @@ const fakeTestCases: TestCase[] = [
 
 const fileTypes: FileType[] = [
   {
-    language: "printscript",
+    language: "printScript",
     extension: "prs",
   },
   {
