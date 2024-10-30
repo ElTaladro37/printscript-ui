@@ -53,6 +53,9 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
   const [code, setCode] = useState(
       ""
   );
+  const [language, setLanguage] = useState("");
+  const [extension, setExtension] = useState("");
+  const [name, setName] = useState("");
   const [shareModalOppened, setShareModalOppened] = useState(false)
   const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = useState(false)
   const [testModalOpened, setTestModalOpened] = useState(false);
@@ -65,6 +68,9 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
   useEffect(() => {
     if (snippet) {
       setCode(snippet.content);
+      setName(snippet.name);
+      setLanguage(snippet.language);
+      setExtension(snippet.extension);
     }
   }, [snippet]);
 
@@ -114,7 +120,7 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
                 </IconButton>
               </Tooltip>
               <Tooltip title={"Save changes"}>
-                <IconButton color={"primary"} onClick={() => updateSnippet({id: id, updateSnippet: {content: code}})} disabled={isUpdateSnippetLoading || snippet?.content === code} >
+                <IconButton color={"primary"} onClick={() => updateSnippet({id: id, updateSnippet: {content: code, name: name, language: language, extension: extension}})} disabled={isUpdateSnippetLoading || snippet?.content === code} >
                   <Save />
                 </IconButton>
               </Tooltip>
