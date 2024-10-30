@@ -1,11 +1,15 @@
-# Usa la imagen de Nginx como base
+# syntax=docker/dockerfile:1
+
+FROM node:20-alpine AS build
+WORKDIR /app
+
+RUN --mount=type=secret,id=github_token,env=GITHUB_TOKEN,required \
+    --mount=type=secret,id=github_username,env=GITHUB_USERNAME,required \
+    echo "Secrets are mounted for authentication"
+
+COPY . .
+RUN npm install && npm run build
 FROM nginx:alpine
-
-# Copia los archivos de la carpeta build (o dist) al contenedor
-COPY dist/ /usr/share/nginx/html
-
-# Exponer el puerto 5173
-EXPOSE 5173
-
-# Comando por defecto para iniciar Nginx
+EXPOSE 80
+COPY --from=build /app/dist /usr/share/nginx/html
 CMD ["nginx", "-g", "daemon off;"]

@@ -1,0 +1,17 @@
+name: "Continuous Deployment Printscript-UI-Master"
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch: {}
+jobs:
+  call_workflow:
+    permissions:
+      contents: read
+      packages: write
+    uses: ElTaladro37/Actions/.github/workflows/docker-publish_main.yml@main
+    with:
+      service_name: "printscript-ui"
+      branch_name: "master"
+      container_name: "printscript-ui"
+    secrets: inherit
