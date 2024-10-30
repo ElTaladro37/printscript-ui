@@ -9,7 +9,7 @@ import {queryClient} from "../../App.tsx";
 type TestSnippetModalProps = {
     open: boolean
     onClose: () => void
-    snippetId: string
+    snippetId: string;
 }
 
 export const TestSnippetModal = ({open, onClose, snippetId}: TestSnippetModalProps) => {

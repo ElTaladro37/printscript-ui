@@ -7,6 +7,7 @@ import {FileType} from "../types/FileType.ts";
 import {Rule} from "../types/Rule.ts";
 import {useAuth0} from "@auth0/auth0-react";
 // import {useAuth0} from "@auth0/auth0-react";
+// import {useEffect} from "react";
 
 
 export const useSnippetsOperations = async () => {
@@ -67,16 +68,19 @@ export const useShareSnippet = () => {
 export const useGetTestCases = (snippetId: string) => {
   const snippetOperations = useSnippetsOperations()
 
-  return useQuery<TestCase[] | undefined, Error>(['testCases'], async () => (await snippetOperations).getTestCases(snippetId), {});
+    return useQuery<TestCase[] | undefined, Error>(['testCases'], async () => (await snippetOperations).getTestCases(snippetId), {});
 };
 
 
 export const usePostTestCase = () => {
-  const snippetOperations = useSnippetsOperations()
+    const snippetOperations = useSnippetsOperations();
 
-  return useMutation<TestCase, Error, Partial<TestCase>>(
-      async (tc) => (await snippetOperations).postTestCase(tc)
-  );
+    return useMutation<TestCase, Error, Partial<TestCase>>(
+        async (tc) => {
+            const completeTestCase: TestCase = { id: tc.id ?? "default-id", ...tc } as TestCase;
+            return (await snippetOperations).postTestCase(completeTestCase);
+        }
+    );
 };
 
 
@@ -95,12 +99,15 @@ export const useRemoveTestCase = ({onSuccess}: {onSuccess: () => void}) => {
 export type TestCaseResult = "success" | "fail"
 
 export const useTestSnippet = () => {
-  const snippetOperations = useSnippetsOperations()
+    const snippetOperations = useSnippetsOperations();
 
-  return useMutation<TestCaseResult, Error, Partial<TestCase>>(
-      async (tc) => (await snippetOperations).testSnippet(tc)
-  )
-}
+    return useMutation<TestCaseResult, Error, Partial<TestCase>>(
+        async (tc) => {
+            const completeTestCase: TestCase = { id: tc.id ?? "default-id", ...tc } as TestCase;
+            return (await snippetOperations).testSnippet(completeTestCase);
+        }
+    );
+};
 
 
 
