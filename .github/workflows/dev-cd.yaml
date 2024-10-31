@@ -5,13 +5,47 @@ on:
       - dev
   workflow_dispatch: {}
 jobs:
-  call_workflow:
+  push_to_registry:
+    name: Push Docker image to GitHub Packages
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-    uses: ElTaladro37/Actions/.github/workflows/docker-publish.yml@main
-    with:
-      service_name: "printscript-ui"
-      branch_name: "dev"
-      container_name: "printscript-ui"
-    secrets: inherit
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ElTaladro37
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker image
+        id: docker_build
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: |
+            ghcr.io/eltaladro37/printscript-ui-dev:latest
+          secrets: |
+            "github_token=${{ secrets.GITHUB_TOKEN }}"
+            "github_username=${{ github.actor }}"
+
+      - name: Update service on VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_KEY }}
+          script: |
+            pwd
+            cd TaladroInfra
+            echo ${{ secrets.GITHUB_TOKEN }} | sudo docker login -u ${{ github.actor }} --password-stdin ghcr.io
+            sudo docker-compose pull printscript-ui-dev
+            sudo docker-compose up -d printscript-ui-dev
