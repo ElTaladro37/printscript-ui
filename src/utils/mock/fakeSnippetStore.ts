@@ -8,7 +8,7 @@ import {Rule} from "../../types/Rule.ts";
 
 const INITIAL_SNIPPETS: Snippet[] = [
   {
-    id: 'b8261834-1b60-45ca-a2d1-86e9ca279b30',
+    id: '006ddf0b-e427-4328-9e0b-c9620207ce15',
     name: 'Super Snippet',
     content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
     compliance: 'pending',
@@ -17,8 +17,8 @@ const INITIAL_SNIPPETS: Snippet[] = [
     extension: 'prs'
   },
   {
-    id: 'c48cf644-fbc1-4649-a8f4-9dd7110640d9',
-    name: 'Extra cool Snippet',
+    id: "8c5ec34e-2f47-4540-922e-49a0d5bc6e7c",
+    name: 'Extra coool Snippet',
     content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
     compliance: 'not-compliant',
     author: 'John Doe',
@@ -26,8 +26,17 @@ const INITIAL_SNIPPETS: Snippet[] = [
     extension: 'prs'
   },
   {
-    id: '34bf4b7a-d4a1-48be-bb26-7d9a3be46227',
+    id: '8c5ec34e-2f47-4540-922e-49a0d5bc6e7c',
     name: 'Boaring Snippet',
+    content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
+    compliance: 'compliant',
+    author: 'John Doe',
+    language: 'printscript',
+    extension: 'prs'
+  },
+  {
+    id: '006ddf0b-e427-4328-9e0b-c9620207ce15',
+    name: 'real snippet',
     content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
     compliance: 'compliant',
     author: 'John Doe',
@@ -165,7 +174,7 @@ export class FakeSnippetStore {
 
   constructor() {
     INITIAL_SNIPPETS.forEach(snippet => {
-      this.snippetMap.set(snippet.id, snippet)
+      this.snippetMap.set('006ddf0b-e427-4328-9e0b-c9620207ce15', snippet)
     })
 
     fakeTestCases.forEach(testCase => {
