@@ -141,8 +141,8 @@ export class FakeSnippetOperations implements SnippetOperations {
     if (existance.data.testcases){
       const data = {
         name: testCase.name,
-        input: testCase.input? testCase.input : [],
-        output: testCase.output? testCase.output : []
+        inputs: testCase.input? testCase.input : [],
+        outputs: testCase.output? testCase.output : []
       }
 
       const response = await axios.put(`https://taladro.duckdns.org/snippet/snippet/test/${id}`, data, {
@@ -155,8 +155,8 @@ export class FakeSnippetOperations implements SnippetOperations {
     }
     const data = {
       name: testCase.name,
-      input: testCase.input? testCase.input : [],
-      output: testCase.output? testCase.output : []
+      inputs: testCase.input? testCase.input : [],
+      outputs: testCase.output? testCase.output : []
     }
 
     const response = await axios.post(`https://taladro.duckdns.org/snippet/snippet/${snippetId}/test`, data, {
@@ -221,12 +221,12 @@ export class FakeSnippetOperations implements SnippetOperations {
   }
 
   async modifyLintingRule(newRules: Rule[]): Promise<Rule[]> {
-    const data = {
-      dto: newRules,
+    const dto = {
+      rules: newRules,
       language: "printScript",
       version: "1.1"
     }
-    const response = await axios.put(`https://taladro.duckdns.org/snippet/lint-rules`, data, {
+    const response = await axios.put(`https://taladro.duckdns.org/snippet/lint-rules`, dto, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
