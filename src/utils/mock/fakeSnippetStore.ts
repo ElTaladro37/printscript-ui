@@ -33,6 +33,15 @@ import {Rule} from "../../types/Rule.ts";
     author: 'John Doe',
     language: 'printscript',
     extension: 'prs'
+  },
+  {
+    id: '006ddf0b-e427-4328-9e0b-c9620207ce15',
+    name: 'real snippet',
+    content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
+    compliance: 'compliant',
+    author: 'John Doe',
+    language: 'printscript',
+    extension: 'prs'
   }
 ]*/
 

@@ -80,10 +80,10 @@ export const useGetTestCases = (snippetId: string) => {
 export const usePostTestCase = () => {
     const snippetOperations = useSnippetsOperations();
 
-    return useMutation<TestCase, Error, Partial<TestCase>>(
-        async (tc) => {
+    return useMutation<TestCase, Error, {tc: Partial<TestCase>, snippetId: string}>(
+        async ({tc, snippetId}) => {
             const completeTestCase: TestCase = { id: tc.id ?? "default-id", ...tc } as TestCase;
-            return (await snippetOperations).postTestCase(completeTestCase);
+            return (await snippetOperations).postTestCase(completeTestCase, snippetId);
         }
     );
 };
@@ -106,10 +106,10 @@ export type TestCaseResult = "success" | "fail"
 export const useTestSnippet = () => {
     const snippetOperations = useSnippetsOperations();
 
-    return useMutation<TestCaseResult, Error, Partial<TestCase>>(
-        async (tc) => {
+    return useMutation<TestCaseResult, Error, {tc: Partial<TestCase>, snippetId: string}>(
+        async ({tc, snippetId}) => {
             const completeTestCase: TestCase = { id: tc.id ?? "default-id", ...tc } as TestCase;
-            return (await snippetOperations).testSnippet(completeTestCase);
+            return (await snippetOperations).testSnippet(completeTestCase, snippetId);
         }
     );
 };
