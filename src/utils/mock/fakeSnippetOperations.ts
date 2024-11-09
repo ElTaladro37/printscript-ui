@@ -2,7 +2,7 @@ import {SnippetOperations} from '../snippetOperations'
 import {FakeSnippetStore} from './fakeSnippetStore'
 import {CreateSnippet, PaginatedSnippets, Snippet, UpdateSnippet} from '../snippet'
 import autoBind from 'auto-bind'
-import {PaginatedUsers} from "../users.ts";
+import {PaginatedUsers, User} from "../users.ts";
 import {TestCase} from "../../types/TestCase.ts";
 import {TestCaseResult} from "../queries.tsx";
 import {FileType} from "../../types/FileType.ts";
@@ -51,7 +51,7 @@ export class FakeSnippetOperations implements SnippetOperations {
 
     async listSnippetDescriptors(page: number, pageSize: number): Promise<PaginatedSnippets> {
         try {
-            const response = await axios.get('http://localhost:8082/snippets/all', {
+            const response = await axios.get('https://taladro.duckdns.org/snippet/snippets/all', {
                 params: {
                     page: page,
                     size: pageSize,
@@ -102,10 +102,34 @@ export class FakeSnippetOperations implements SnippetOperations {
     return response.data;
   }
 
-  getUserFriends(name: string = "", page: number = 1, pageSize: number = 10): Promise<PaginatedUsers> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.getUserFriends(name,page,pageSize)), DELAY)
-    })
+  async getUserFriends(name: string = "", page: number = 1, pageSize: number = 10): Promise<PaginatedUsers> {
+      try {
+          const response = await axios.get('https://taladro.duckdns.org/snippet/user', {
+              params: {
+                  page: page - 1,
+                  size: pageSize,
+              },
+              headers: {
+                  Authorization: `Bearer ${this.token}`
+              }
+          });
+
+          const users: User[] = response.data.map((user: any) => ({
+              id: user.user_id,
+              name: user.email,
+              email: user.email,
+          }));
+
+          return {
+              page: page,
+              page_size: pageSize,
+              count: users.length,
+              users: users
+          };
+      } catch (error) {
+          console.error("Error al obtener usuarios:", error);
+          throw error;
+      }
   }
 
   shareSnippet(snippetId: string, userId: string): Promise<Snippet> {
