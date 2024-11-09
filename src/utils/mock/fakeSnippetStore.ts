@@ -134,13 +134,13 @@ const INITIAL_LINTING_RULES: Rule[] = [
 
 const fakeTestCases: TestCase[] = [
   {
-    id: uuid(),
+    testId: uuid(),
     name: "Test Case 1",
     input: ["A", "B"],
     output: ["C", "D"]
   },
   {
-    id: uuid(),
+    testId: uuid(),
     name: "Test Case 2",
     input: ["E", "F"],
     output: ["G", "H"]
@@ -178,7 +178,7 @@ export class FakeSnippetStore {
     })
 
     fakeTestCases.forEach(testCase => {
-      this.testCaseMap.set(testCase.id, testCase)
+      this.testCaseMap.set(testCase.testId, testCase)
     })
     this.formattingRules = INITIAL_FORMATTING_RULES
     this.lintingRules = INITIAL_LINTING_RULES
@@ -246,8 +246,8 @@ export class FakeSnippetStore {
   }
 
   postTestCase(testCase: Partial<TestCase>): TestCase {
-    const id = testCase.id ?? uuid()
-    const newTestCase = {...testCase, id} as TestCase
+    const id = testCase.testId ?? uuid()
+    const newTestCase = {...testCase, testId: id} as TestCase
     this.testCaseMap.set(id,newTestCase)
     return newTestCase
   }
