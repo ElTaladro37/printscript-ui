@@ -136,14 +136,14 @@ const fakeTestCases: TestCase[] = [
   {
     testId: uuid(),
     name: "Test Case 1",
-    input: ["A", "B"],
-    output: ["C", "D"]
+    inputs: ["A", "B"],
+    outputs: ["C", "D"]
   },
   {
     testId: uuid(),
     name: "Test Case 2",
-    input: ["E", "F"],
-    output: ["G", "H"]
+    inputs: ["E", "F"],
+    outputs: ["G", "H"]
   },
 ]
 
