@@ -43,9 +43,14 @@ const HomeScreen = () => {
     setSearchTerm(snippetName);
   };
 
+    const handleClickSnippet = (id: string) => {
+        setSnippetId(id);
+        console.log(snippetId);
+    };
+
   return (
       <>
-        <SnippetTable loading={isLoading} handleClickSnippet={setSnippetId} snippets={data?.snippets}
+        <SnippetTable loading={isLoading} handleClickSnippet={handleClickSnippet} snippets={data?.snippets}
                       handleSearchSnippet={handleSearchSnippet}/>
         <Drawer open={!!snippetId} anchor={"right"} onClose={handleCloseModal}>
           {snippetId && <SnippetDetail handleCloseModal={handleCloseModal} id={snippetId}/>}

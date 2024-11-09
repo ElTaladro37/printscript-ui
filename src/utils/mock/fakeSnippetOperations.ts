@@ -39,9 +39,6 @@ export class FakeSnippetOperations implements SnippetOperations {
   }
 
   async getSnippetById(id: string): Promise<Snippet | undefined> {
-    // return new Promise(resolve => {
-    //   setTimeout(() => resolve(this.fakeStore.getSnippetById(id)), DELAY)
-    // })
 
     const response = await axios.get(`http://localhost:8082/snippet/${id}`, {
       headers: {
@@ -52,22 +49,40 @@ export class FakeSnippetOperations implements SnippetOperations {
     return response.data;
   }
 
-  listSnippetDescriptors(page: number,pageSize: number): Promise<PaginatedSnippets> {
-    // const response = await axios.post('http://localhost:8082/snippet/text', {
-    //
-    // })
+    async listSnippetDescriptors(page: number, pageSize: number): Promise<PaginatedSnippets> {
+        try {
+            const response = await axios.get('http://localhost:8082/snippets/all', {
+                params: {
+                    page: page,
+                    size: pageSize,
+                    owner: true,
+                    share: true
+                },
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
+            });
 
-    const response: PaginatedSnippets = {
-      page: page,
-      page_size: pageSize,
-      count: 20,
-      snippets: page == 0 ? this.fakeStore.listSnippetDescriptors().splice(0,pageSize) : this.fakeStore.listSnippetDescriptors().splice(1,2)
+            const snippets: Snippet[] = response.data.map((item: any) => ({
+                snippetId: item.snippetId,
+                name: item.name,
+                description: item.description,
+                language: item.language,
+                version: item.version,
+                snippetFile: item.snippetFile
+            }));
+
+            return {
+                page: page,
+                page_size: pageSize,
+                count: snippets.length,
+                snippets: snippets
+            };
+        } catch (error) {
+            console.error("Error al obtener snippets:", error);
+            throw error;
+        }
     }
-
-    return new Promise(resolve => {
-      setTimeout(() => resolve(response), DELAY)
-    })
-  }
 
   async updateSnippetById(id: string, updateSnippet: UpdateSnippet): Promise<Snippet> {
     const data = {
@@ -120,7 +135,7 @@ export class FakeSnippetOperations implements SnippetOperations {
   }
 
   async getTestCases(snippetId: String): Promise<TestCase[]> {
-    const response = await axios.get(`http://localhost:8082/snippet/test${snippetId}`, {
+    const response = await axios.get(`http://localhost:8082/snippet/test/${snippetId}`, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }

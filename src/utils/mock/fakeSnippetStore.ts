@@ -6,7 +6,7 @@ import {TestCaseResult} from "../queries.tsx";
 import {FileType} from "../../types/FileType.ts";
 import {Rule} from "../../types/Rule.ts";
 
-const INITIAL_SNIPPETS: Snippet[] = [
+/*const INITIAL_SNIPPETS: Snippet[] = [
   {
     id: 'b8261834-1b60-45ca-a2d1-86e9ca279b30',
     name: 'Super Snippet',
@@ -34,7 +34,7 @@ const INITIAL_SNIPPETS: Snippet[] = [
     language: 'printscript',
     extension: 'prs'
   }
-]
+]*/
 
 const paginatedUsers: PaginatedUsers = {
   count: 5,
@@ -164,9 +164,6 @@ export class FakeSnippetStore {
   private lintingRules: Rule[] = [];
 
   constructor() {
-    INITIAL_SNIPPETS.forEach(snippet => {
-      this.snippetMap.set(snippet.id, snippet)
-    })
 
     fakeTestCases.forEach(testCase => {
       this.testCaseMap.set(testCase.id, testCase)
