@@ -2,10 +2,7 @@ import {Pagination} from "./pagination.ts";
 import {FileType} from "../types/FileType.ts";
 
 export type ComplianceEnum =
-    'pending' |
-    'failed' |
-    'not-compliant' |
-    'compliant'
+    string
 
 
 export type CreateSnippet = {

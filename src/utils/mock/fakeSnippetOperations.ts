@@ -49,15 +49,22 @@ export class FakeSnippetOperations implements SnippetOperations {
     return response.data;
   }
 
-    async listSnippetDescriptors(page: number, pageSize: number): Promise<PaginatedSnippets> {
+    async listSnippetDescriptors(page: number, pageSize: number, name: string ): Promise<PaginatedSnippets> {
         try {
+
+            const params: any = {
+                page: page,
+                size: pageSize,
+                owner: true,
+                share: true
+            };
+            
+            if (name) {
+                params.name = name;
+            }
+console.error(params)
             const response = await axios.get('https://taladro.duckdns.org/snippet/snippets/all', {
-                params: {
-                    page: page,
-                    size: pageSize,
-                    owner: true,
-                    share: true
-                },
+                params: params,
                 headers: {
                     Authorization: `Bearer ${this.token}`
                 }
