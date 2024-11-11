@@ -1,6 +1,6 @@
 import {SnippetOperations} from '../snippetOperations'
 import {FakeSnippetStore} from './fakeSnippetStore'
-import {CreateSnippet, PaginatedSnippets, Snippet, UpdateSnippet} from '../snippet'
+import {ComplianceEnum, CreateSnippet, PaginatedSnippets, Snippet, UpdateSnippet} from '../snippet'
 import autoBind from 'auto-bind'
 import {PaginatedUsers, User} from "../users.ts";
 import {TestCase} from "../../types/TestCase.ts";
@@ -63,19 +63,23 @@ export class FakeSnippetOperations implements SnippetOperations {
                 }
             });
 
-            const snippets: Snippet[] = response.data.map((item: any) => ({
+            const { totalCount, snippets: snippetList } = response.data;
+
+            const snippets: Snippet[] = snippetList.map((item: any) => ({
                 snippetId: item.snippetId,
                 name: item.name,
                 description: item.description,
                 language: item.language,
                 version: item.version,
-                snippetFile: item.snippetFile
+                snippetFile: item.snippetFile,
+                compliance: item.status as ComplianceEnum,
+                author: item.ownerId,
             }));
 
             return {
                 page: page,
                 page_size: pageSize,
-                count: snippets.length,
+                count: totalCount,
                 snippets: snippets
             };
         } catch (error) {
