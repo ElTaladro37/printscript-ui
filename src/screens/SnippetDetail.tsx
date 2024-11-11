@@ -156,7 +156,7 @@ export const SnippetDetail = (props: SnippetDetailProps) => {
                            onClose={() => setShareModalOppened(false)}
                            onShare={handleShareSnippet}/>
         <TestSnippetModal open={testModalOpened} onClose={() => setTestModalOpened(false)} snippetId={id}/>
-        <DeleteConfirmationModal open={deleteConfirmationModalOpen} onClose={() => setDeleteConfirmationModalOpen(false)} id={snippet?.id ?? ""} setCloseDetails={handleCloseModal} />
+        <DeleteConfirmationModal open={deleteConfirmationModalOpen} onClose={() => setDeleteConfirmationModalOpen(false)} id={snippet?.snippetId ?? ""} setCloseDetails={handleCloseModal} />
       </Box>
   );
 }

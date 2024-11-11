@@ -6,9 +6,9 @@ import {TestCaseResult} from "../queries.tsx";
 import {FileType} from "../../types/FileType.ts";
 import {Rule} from "../../types/Rule.ts";
 
-const INITIAL_SNIPPETS: Snippet[] = [
+/*const INITIAL_SNIPPETS: Snippet[] = [
   {
-    id: '006ddf0b-e427-4328-9e0b-c9620207ce15',
+    id: 'b8261834-1b60-45ca-a2d1-86e9ca279b30',
     name: 'Super Snippet',
     content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
     compliance: 'pending',
@@ -17,8 +17,8 @@ const INITIAL_SNIPPETS: Snippet[] = [
     extension: 'prs'
   },
   {
-    id: "8c5ec34e-2f47-4540-922e-49a0d5bc6e7c",
-    name: 'Extra coool Snippet',
+    id: 'c48cf644-fbc1-4649-a8f4-9dd7110640d9',
+    name: 'Extra cool Snippet',
     content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
     compliance: 'not-compliant',
     author: 'John Doe',
@@ -26,7 +26,7 @@ const INITIAL_SNIPPETS: Snippet[] = [
     extension: 'prs'
   },
   {
-    id: '8c5ec34e-2f47-4540-922e-49a0d5bc6e7c',
+    id: '34bf4b7a-d4a1-48be-bb26-7d9a3be46227',
     name: 'Boaring Snippet',
     content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
     compliance: 'compliant',
@@ -43,7 +43,7 @@ const INITIAL_SNIPPETS: Snippet[] = [
     language: 'printscript',
     extension: 'prs'
   }
-]
+]*/
 
 const paginatedUsers: PaginatedUsers = {
   count: 5,
@@ -173,9 +173,6 @@ export class FakeSnippetStore {
   private lintingRules: Rule[] = [];
 
   constructor() {
-    INITIAL_SNIPPETS.forEach(snippet => {
-      this.snippetMap.set('006ddf0b-e427-4328-9e0b-c9620207ce15', snippet)
-    })
 
     fakeTestCases.forEach(testCase => {
       this.testCaseMap.set(testCase.testId, testCase)
@@ -189,14 +186,14 @@ export class FakeSnippetStore {
   }
 
   createSnippet(createSnippet: CreateSnippet): Snippet {
-    const id = uuid();
+    const snippetId = uuid();
     const newSnippet = {
-      id,
+      snippetId,
       compliance: 'compliant' as ComplianceEnum,
       author: 'yo',
       ...createSnippet
     }
-    this.snippetMap.set(id, newSnippet)
+    this.snippetMap.set(snippetId, newSnippet)
 
     return newSnippet
   }
