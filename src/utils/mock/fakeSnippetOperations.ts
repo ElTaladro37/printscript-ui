@@ -7,7 +7,7 @@ import {TestCase} from "../../types/TestCase.ts";
 import {TestCaseResult} from "../queries.tsx";
 import {FileType} from "../../types/FileType.ts";
 import {Rule} from "../../types/Rule.ts";
-import axios from 'axios';
+import axios, {AxiosResponse} from 'axios';
 const DELAY: number = 1000
 
 export class FakeSnippetOperations implements SnippetOperations {
@@ -169,56 +169,64 @@ export class FakeSnippetOperations implements SnippetOperations {
     })
   }
 
-  async getTestCases(snippetId: String): Promise<TestCase[]> {
+  async getTestCases(snippetId: string): Promise<TestCase[]> {
     const response = await axios.get(`https://taladro.duckdns.org/snippet/snippet/${snippetId}/test`, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
     });
     console.log(response.data)
-    return response.data;
+    return response.data.testCases;
   }
 
   async postTestCase(testCase: TestCase, snippetId: string): Promise<TestCase> {
-    const id = testCase.id
+    const id = testCase.testId
 
-    const existance = await axios.get(`https://taladro.duckdns.org/snippet/snippet/${snippetId}/test`, {
+    const existence: AxiosResponse<{testCases:TestCase[]}> = await axios.get(`https://taladro.duckdns.org/snippet/snippet/${snippetId}/test`, {
         headers: {
             Authorization: `Bearer ${this.token}`
         }
     });
 
-    if (existance.data.testcases){
       const data = {
-        name: testCase.name,
-        inputs: testCase.input? testCase.input : [],
-        outputs: testCase.output? testCase.output : []
+          name: testCase.name,
+          inputs: testCase.inputs ? testCase.inputs : [],
+          outputs: testCase.outputs ? testCase.outputs : []
       }
 
-      const response = await axios.put(`https://taladro.duckdns.org/snippet/snippet/test/${id}`, data, {
-        headers: {
-          Authorization: `Bearer ${this.token}`
+      if (existence.data.testCases) {
+
+        const isAlreadyCreated = existence.data.testCases.map(t => t.testId).some(t => t === id);
+
+        if (isAlreadyCreated) {
+            const response = await axios.put(`https://taladro.duckdns.org/snippet/snippet/test/${id}`, data, {
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
+            });
+
+            return response.data;
         }
-      });
-
-      return response.data;
+        else {
+            return await this.save(snippetId, data);
+        }
+    
     }
-    const data = {
-      name: testCase.name,
-      inputs: testCase.input? testCase.input : [],
-      outputs: testCase.output? testCase.output : []
-    }
-
-    const response = await axios.post(`https://taladro.duckdns.org/snippet/snippet/${snippetId}/test`, data, {
-      headers: {
-        Authorization: `Bearer ${this.token}`
+    else {
+          return await this.save(snippetId, data);
       }
-    });
-
-    return response.data;
   }
 
-  async removeTestCase(id: string): Promise<string> {
+    private async save(snippetId: string, data: { outputs: string[]; inputs: string[]; name: string }) {
+        const response = await axios.post(`https://taladro.duckdns.org/snippet/snippet/${snippetId}/test`, data, {
+            headers: {
+                Authorization: `Bearer ${this.token}`
+            }
+        });
+        return response.data;
+    }
+
+    async removeTestCase(id: string): Promise<string> {
     const response = await axios.delete(`https://taladro.duckdns.org/snippet/snippet/test/${id}`, {
       headers: {
         Authorization: `Bearer ${this.token}`
@@ -231,17 +239,17 @@ export class FakeSnippetOperations implements SnippetOperations {
   async testSnippet(test: TestCase, snipppetId: string): Promise<TestCaseResult> {
     const data = {
       name: test.name,
-      input: test.input,
-      output: test.output
+      inputs: test.inputs,
+      outputs: test.outputs
     }
 
-    const response = await axios.post(`https://taladro.duckdns.org/snippet/snippet/${snipppetId}/test`, data, {
+    const response = await axios.post(`https://taladro.duckdns.org/snippet/snippet/${snipppetId}/test/run`, data, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
     });
 
-    return response.data;
+    return response.data.isValid ? 'success' : 'fail';
   }
 
   async deleteSnippet(id: string): Promise<string> {

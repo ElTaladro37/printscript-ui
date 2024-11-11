@@ -26,11 +26,11 @@ export const TestSnippetModal = ({open, onClose, snippetId}: TestSnippetModalPro
     });
 
     useEffect(() => {
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) ) {
             setTestCases(data);
             console.log(data);
         }
-    }, [data]);
+    }, [data, testCases]);
 
     const handleChange = (_: SyntheticEvent, newValue: number) => {
         setValue(newValue);

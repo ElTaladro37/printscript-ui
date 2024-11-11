@@ -6,8 +6,6 @@ import {TestCase} from "../types/TestCase.ts";
 import {FileType} from "../types/FileType.ts";
 import {Rule} from "../types/Rule.ts";
 import {useAuth0} from "@auth0/auth0-react";
-// import {useAuth0} from "@auth0/auth0-react";
-// import {useEffect} from "react";
 
 
 export const useSnippetsOperations = async () => {
@@ -82,7 +80,7 @@ export const usePostTestCase = () => {
 
     return useMutation<TestCase, Error, {tc: Partial<TestCase>, snippetId: string}>(
         async ({tc, snippetId}) => {
-            const completeTestCase: TestCase = { id: tc.id ?? "default-id", ...tc } as TestCase;
+            const completeTestCase: TestCase = { testId: tc.testId ?? "default-id", ...tc } as TestCase;
             return (await snippetOperations).postTestCase(completeTestCase, snippetId);
         }
     );
@@ -108,7 +106,7 @@ export const useTestSnippet = () => {
 
     return useMutation<TestCaseResult, Error, {tc: Partial<TestCase>, snippetId: string}>(
         async ({tc, snippetId}) => {
-            const completeTestCase: TestCase = { id: tc.id ?? "default-id", ...tc } as TestCase;
+            const completeTestCase: TestCase = { testId: tc.testId ?? "default-id", ...tc } as TestCase;
             return (await snippetOperations).testSnippet(completeTestCase, snippetId);
         }
     );
