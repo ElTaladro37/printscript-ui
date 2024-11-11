@@ -52,5 +52,5 @@ jobs:
             pwd
             cd TaladroInfra
             echo ${{ secrets.GITHUB_TOKEN }} | sudo docker login -u ${{ github.actor }} --password-stdin ghcr.io
-            sudo docker-compose pull printscript-ui-dev
-            sudo docker-compose up -d printscript-ui-dev
+            sudo docker-compose pull printscript-ui
+            sudo docker-compose up -d printscript-ui

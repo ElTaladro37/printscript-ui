@@ -1,5 +1,5 @@
 import {useMutation, UseMutationResult, useQuery} from 'react-query';
-import {CreateSnippet, PaginatedSnippets, Snippet, UpdateSnippet} from './snippet.ts';
+import {CreateSnippet, Snippet, UpdateSnippet} from './snippet.ts';
 import {PaginatedUsers} from "./users.ts";
 import {FakeSnippetOperations} from "./mock/fakeSnippetOperations.ts";
 import {TestCase} from "../types/TestCase.ts";
@@ -18,7 +18,12 @@ export const useSnippetsOperations = async () => {
 export const useGetSnippets = (page: number = 0, pageSize: number = 10, snippetName?: string) => {
   const snippetOperations = useSnippetsOperations()
 
-  return useQuery<PaginatedSnippets, Error>(['listSnippets', page,pageSize,snippetName], async () => (await snippetOperations).listSnippetDescriptors(page, pageSize));
+    return useQuery(
+        ['listSnippets', page, pageSize, snippetName],
+        async () => {
+            return (await snippetOperations).listSnippetDescriptors(page, pageSize, snippetName);
+        }
+    );
 };
 
 export const useGetSnippetById = (id: string) => {
