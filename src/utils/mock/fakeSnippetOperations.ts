@@ -120,6 +120,8 @@ export class FakeSnippetOperations implements SnippetOperations {
               email: user.email,
           }));
 
+          console.log(name);
+
           return {
               page: page,
               page_size: pageSize,
