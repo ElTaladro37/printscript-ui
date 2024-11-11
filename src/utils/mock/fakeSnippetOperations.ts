@@ -132,18 +132,21 @@ export class FakeSnippetOperations implements SnippetOperations {
       }
   }
 
-  async shareSnippet(snippetId: string, userId: string): Promise<Snippet> {
+  async shareSnippet(snippetId: string, receiverId: string): Promise<Snippet> {
       try {
           const response = await axios.post(
-              `https://taladro.duckdns.org/snippet/${snippetId}/share`,
-              userId,
-              {headers: {Authorization: `Bearer ${this.token}`}}
+              `https://taladro.duckdns.org/snippet/snippet/${snippetId}/share`,
+              receiverId,
+              {headers: {
+                  Authorization: `Bearer ${this.token}`,
+                      'Content-Type': 'text/plain',
+                  }}
           );
 
-          console.log(`Snippet ${snippetId} shared with user ${userId}`);
-          return response.data.snippetId;
+          console.log(`Snippet ${snippetId} shared with user ${receiverId}`);
+          return response.data;
       } catch (error) {
-          console.error(`Error sharing snippet ${snippetId} with user ${userId}:`, error);
+          console.error(`Error sharing snippet ${snippetId} with user ${receiverId}:`, error);
           throw error;
       }
   }
