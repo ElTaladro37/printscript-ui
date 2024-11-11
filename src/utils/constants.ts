@@ -1,4 +1,5 @@
 export const FRONTEND_URL = process?.env?.FRONTEND_URL ?? "http://localhost:5173"
-export const BACKEND_URL = process?.env?.BACKEND_URL ?? "http://localhost:8080/api"
+export const BACKEND_URL = process?.env?.BACKEND_URL ?? "https://taladro.duckdns.org/snippet/"
 export const AUTH0_USERNAME = process?.env?.AUTH0_USERNAME ?? "pablo@example.com"
 export const AUTH0_PASSWORD = process?.env?.AUTH0_PASSWORD ?? "Pablo123_"
+export const VITE_AUTH0_DOMAIN = process.env.VITE_AUTH0_DOMAIN ?? "dev-yjbbmbvlnk6d2bqm.us.auth0.com"
