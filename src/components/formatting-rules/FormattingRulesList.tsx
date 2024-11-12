@@ -21,7 +21,12 @@ const FormattingRulesList = () => {
   })
 
   useEffect(() => {
-    setRules(data)
+    console.log(rules, data)
+    if (data) {
+      setRules(data);
+    } else {
+      setRules([]);
+    }
   }, [data]);
 
   const handleValueChange = (rule: Rule, newValue: string | number) => {

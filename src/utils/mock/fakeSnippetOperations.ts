@@ -171,7 +171,7 @@ console.error(params)
                 {headers: {Authorization: `Bearer ${this.token}`}}
           )
           console.log("format rules: ", response.data)
-          return response.data;
+          return response.data.rules;
       }
       catch (error) {
             console.error("Error al obtener reglas de formato:", error);
@@ -187,7 +187,7 @@ console.error(params)
               {headers: {Authorization: `Bearer ${this.token}`}}
           )
           console.log("linting rules: ", response.data)
-          return response.data;
+          return response.data.rules;
       }
       catch (error) {
           console.error("Error al obtener reglas de linteo:", error);
