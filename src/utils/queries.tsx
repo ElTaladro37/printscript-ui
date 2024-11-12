@@ -21,7 +21,7 @@ export const useGetSnippets = (page: number = 0, pageSize: number = 10, snippetN
     return useQuery(
         ['listSnippets', page, pageSize, snippetName],
         async () => {
-            return (await snippetOperations).listSnippetDescriptors(page, pageSize);
+            return (await snippetOperations).listSnippetDescriptors(page, pageSize, snippetName);
         }
     );
 };
