@@ -153,16 +153,35 @@ export class FakeSnippetOperations implements SnippetOperations {
       }
   }
 
-  getFormatRules(): Promise<Rule[]> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.getFormatRules()), DELAY)
-    })
+  async getFormatRules(): Promise<Rule[]> {
+      try {
+          const response = await axios.get(
+                'https://taladro.duckdns.org/snippet/format-rules/printScript/1.1',
+                {headers: {Authorization: `Bearer ${this.token}`}}
+          )
+          console.log("format rules: ", response.data)
+          return response.data;
+      }
+      catch (error) {
+            console.error("Error al obtener reglas de formato:", error);
+            throw error;
+      }
   }
 
-  getLintingRules(): Promise<Rule[]> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.getLintingRules()), DELAY)
-    })
+  async getLintingRules(): Promise<Rule[]> {
+      console.log("llego")
+      try {
+          const response = await axios.get(
+              'https://taladro.duckdns.org/snippet/lint-rules/printScript/1.1',
+              {headers: {Authorization: `Bearer ${this.token}`}}
+          )
+          console.log("linting rules: ", response.data)
+          return response.data;
+      }
+      catch (error) {
+          console.error("Error al obtener reglas de linteo:", error);
+          throw error;
+      }
   }
 
   formatSnippet(snippetContent: string): Promise<string> {
@@ -212,7 +231,7 @@ export class FakeSnippetOperations implements SnippetOperations {
         else {
             return await this.save(snippetId, data);
         }
-    
+
     }
     else {
           return await this.save(snippetId, data);
@@ -271,7 +290,12 @@ export class FakeSnippetOperations implements SnippetOperations {
   }
 
   async modifyFormatRule(newRules: Rule[]): Promise<Rule[]> {
-    const response = await axios.put(`https://taladro.duckdns.org/snippet/snippet/format`, newRules, {
+    const dto = {
+        rules: newRules,
+        language: "printScript",
+        version: "1.1"
+    }
+    const response = await axios.put(`https://taladro.duckdns.org/snippet/format-rules`, dto, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
@@ -291,7 +315,7 @@ export class FakeSnippetOperations implements SnippetOperations {
         Authorization: `Bearer ${this.token}`
       }
     })
-
+    console.log("hola")
     return response.data;
   }
 }
