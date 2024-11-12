@@ -49,7 +49,7 @@ export class FakeSnippetOperations implements SnippetOperations {
     return response.data;
   }
 
-    async listSnippetDescriptors(page: number, pageSize: number, name: string ): Promise<PaginatedSnippets> {
+    async listSnippetDescriptors(page: number, pageSize: number, name?: string ): Promise<PaginatedSnippets> {
         try {
 
             const params: any = {
