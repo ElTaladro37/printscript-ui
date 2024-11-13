@@ -196,13 +196,13 @@ console.error(params)
   }
 
   async formatSnippet(snippetId: string): Promise<string> {
-      const resposne = await axios.patch(`https://taladro.duckdns.org/snippet/format-rules/format/${snippetId}`, {
-            headers: {
-                Authorization: `Bearer ${this.token}`
-            }
-      })
-      console.log(resposne.data)
-      return resposne.data;
+    const response = await axios.patch(`https://taladro.duckdns.org/snippet/format-rules/format/${snippetId}`, {}, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+    console.log(response.data);
+    return response.data;
   }
 
   async getTestCases(snippetId: string): Promise<TestCase[]> {
