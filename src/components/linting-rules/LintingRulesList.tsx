@@ -21,7 +21,12 @@ const LintingRulesList = () => {
   });
 
   useEffect(() => {
-    setRules(data);
+    console.log("data",data)
+    if (Array.isArray(data)) {
+      setRules(data);
+    } else {
+      setRules([]);
+    }
   }, [data]);
 
   const handleValueChange = (rule: Rule, newValue: string | number) => {

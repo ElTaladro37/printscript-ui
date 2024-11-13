@@ -15,7 +15,7 @@ export const useSnippetsOperations = async () => {
   return new FakeSnippetOperations(token);
 }
 
-export const useGetSnippets = (page: number = 0, pageSize: number = 10, snippetName?: string) => {
+export const useGetSnippets = (page: number = 0, pageSize: number = 10, snippetName: string) => {
   const snippetOperations = useSnippetsOperations()
 
     return useQuery(
@@ -150,7 +150,7 @@ export const useFormatSnippet = () => {
   const snippetOperations = useSnippetsOperations()
 
   return useMutation<string, Error, string>(
-      async snippetContent => (await snippetOperations).formatSnippet(snippetContent)
+      async snippetId => (await snippetOperations).formatSnippet(snippetId)
   );
 }
 
