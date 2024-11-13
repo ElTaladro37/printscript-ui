@@ -1,112 +1,301 @@
 import {SnippetOperations} from '../snippetOperations'
 import {FakeSnippetStore} from './fakeSnippetStore'
-import {CreateSnippet, PaginatedSnippets, Snippet, UpdateSnippet} from '../snippet'
+import {ComplianceEnum, CreateSnippet, PaginatedSnippets, Snippet, UpdateSnippet} from '../snippet'
 import autoBind from 'auto-bind'
-import {PaginatedUsers} from "../users.ts";
+import {PaginatedUsers, User} from "../users.ts";
 import {TestCase} from "../../types/TestCase.ts";
 import {TestCaseResult} from "../queries.tsx";
 import {FileType} from "../../types/FileType.ts";
 import {Rule} from "../../types/Rule.ts";
-
+import axios, {AxiosResponse} from 'axios';
 const DELAY: number = 1000
 
 export class FakeSnippetOperations implements SnippetOperations {
   private readonly fakeStore = new FakeSnippetStore()
+  private readonly token: string;
 
-  constructor() {
+  constructor(token: string) {
     autoBind(this)
+    this.token = token;
   }
 
-  createSnippet(createSnippet: CreateSnippet): Promise<Snippet> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.createSnippet(createSnippet)), DELAY)
-    })
+  async createSnippet(createSnippet: CreateSnippet): Promise<Snippet> {
+    const data = {
+      name: createSnippet.name,
+      description: "description",
+      language: createSnippet.language,
+      version: "1.1",
+      snippetFile: createSnippet.content
+    };
+
+    const response = await axios.post('https://taladro.duckdns.org/snippet/snippet/text', data, {
+      headers: {
+        Authorization: `Bearer ${this.token }`
+      }
+    });
+
+    console.log(response.data)
+    return response.data;
   }
 
-  getSnippetById(id: string): Promise<Snippet | undefined> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.getSnippetById(id)), DELAY)
-    })
+  async getSnippetById(id: string): Promise<Snippet | undefined> {
+
+    const response = await axios.get(`https://taladro.duckdns.org/snippet/snippet/${id}`, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+
+    return response.data;
   }
 
-  listSnippetDescriptors(page: number,pageSize: number): Promise<PaginatedSnippets> {
-    const response: PaginatedSnippets = {
-      page: page,
-      page_size: pageSize,
-      count: 20,
-      snippets: page == 0 ? this.fakeStore.listSnippetDescriptors().splice(0,pageSize) : this.fakeStore.listSnippetDescriptors().splice(1,2)
+    async listSnippetDescriptors(page: number, pageSize: number, name?: string ): Promise<PaginatedSnippets> {
+        try {
+
+            const params: any = {
+                page: page,
+                size: pageSize,
+                owner: true,
+                share: true
+            };
+            
+            if (name) {
+                params.name = name;
+            }
+console.error(params)
+            const response = await axios.get('https://taladro.duckdns.org/snippet/snippets/all', {
+                params: params,
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
+            });
+
+            const { totalCount, snippets: snippetList } = response.data;
+
+            const snippets: Snippet[] = snippetList.map((item: any) => ({
+                snippetId: item.snippetId,
+                name: item.name,
+                description: item.description,
+                language: item.language,
+                version: item.version,
+                snippetFile: item.snippetFile,
+                compliance: item.status as ComplianceEnum,
+                author: item.ownerId,
+            }));
+
+            return {
+                page: page,
+                page_size: pageSize,
+                count: totalCount,
+                snippets: snippets
+            };
+        } catch (error) {
+            console.error("Error al obtener snippets:", error);
+            throw error;
+        }
     }
 
-    return new Promise(resolve => {
-      setTimeout(() => resolve(response), DELAY)
-    })
+  async updateSnippetById(id: string, updateSnippet: UpdateSnippet): Promise<Snippet> {
+    const data = {
+      snippetFile: updateSnippet.content,
+      name: updateSnippet.name,
+      language: updateSnippet.language?? "printScript",
+      version: updateSnippet.extension?? "1.1",
+      description: "esto nose que es"
+    }
+
+    const response = await axios.put(`https://taladro.duckdns.org/snippet/snippet/${id}/text`, data, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+
+    return response.data;
   }
 
-  updateSnippetById(id: string, updateSnippet: UpdateSnippet): Promise<Snippet> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.updateSnippet(id, updateSnippet)), DELAY)
-    })
+  async getUserFriends(name: string = "", page: number = 1, pageSize: number = 10): Promise<PaginatedUsers> {
+      try {
+          const response = await axios.get('https://taladro.duckdns.org/snippet/user', {
+              params: {
+                  page: page - 1,
+                  size: pageSize,
+              },
+              headers: {
+                  Authorization: `Bearer ${this.token}`
+              }
+          });
+
+          const users: User[] = response.data.map((user: any) => ({
+              id: user.user_id,
+              name: user.email,
+              email: user.email,
+          }));
+
+          console.log(name);
+
+          return {
+              page: page,
+              page_size: pageSize,
+              count: users.length,
+              users: users
+          };
+      } catch (error) {
+          console.error("Error al obtener usuarios:", error);
+          throw error;
+      }
   }
 
-  getUserFriends(name: string = "", page: number = 1, pageSize: number = 10): Promise<PaginatedUsers> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.getUserFriends(name,page,pageSize)), DELAY)
-    })
+  async shareSnippet(snippetId: string, receiverId: string): Promise<Snippet> {
+      try {
+          const response = await axios.post(
+              `https://taladro.duckdns.org/snippet/snippet/${snippetId}/share`,
+              receiverId,
+              {headers: {
+                  Authorization: `Bearer ${this.token}`,
+                      'Content-Type': 'text/plain',
+                  }}
+          );
+
+          console.log(`Snippet ${snippetId} shared with user ${receiverId}`);
+          return response.data;
+      } catch (error) {
+          console.error(`Error sharing snippet ${snippetId} with user ${receiverId}:`, error);
+          throw error;
+      }
   }
 
-  shareSnippet(snippetId: string): Promise<Snippet> {
-    return new Promise(resolve => {
-      // @ts-expect-error, it will always find it in the fake store
-      setTimeout(() => resolve(this.fakeStore.getSnippetById(snippetId)), DELAY)
-    })
+  async getFormatRules(): Promise<Rule[]> {
+      try {
+          const response = await axios.get(
+                'https://taladro.duckdns.org/snippet/format-rules/printScript/1.1',
+                {headers: {Authorization: `Bearer ${this.token}`}}
+          )
+          console.log("format rules: ", response.data)
+          return response.data.rules;
+      }
+      catch (error) {
+            console.error("Error al obtener reglas de formato:", error);
+            throw error;
+      }
   }
 
-  getFormatRules(): Promise<Rule[]> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.getFormatRules()), DELAY)
-    })
+  async getLintingRules(): Promise<Rule[]> {
+      console.log("llego")
+      try {
+          const response = await axios.get(
+              'https://taladro.duckdns.org/snippet/lint-rules/printScript/1.1',
+              {headers: {Authorization: `Bearer ${this.token}`}}
+          )
+          console.log("linting rules: ", response.data)
+          return response.data.rules;
+      }
+      catch (error) {
+          console.error("Error al obtener reglas de linteo:", error);
+          throw error;
+      }
   }
 
-  getLintingRules(): Promise<Rule[]> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.getLintingRules()), DELAY)
-    })
+  async formatSnippet(snippetId: string): Promise<string> {
+    const response = await axios.patch(`https://taladro.duckdns.org/snippet/format-rules/format/${snippetId}`, {}, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+    console.log(response.data);
+    return response.data;
   }
 
-  formatSnippet(snippetContent: string): Promise<string> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.formatSnippet(snippetContent)), DELAY)
-    })
+  async getTestCases(snippetId: string): Promise<TestCase[]> {
+    const response = await axios.get(`https://taladro.duckdns.org/snippet/snippet/${snippetId}/test`, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+    console.log(response.data)
+    return response.data.testCases;
   }
 
-  getTestCases(): Promise<TestCase[]> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.getTestCases()), DELAY)
-    })
+  async postTestCase(testCase: TestCase, snippetId: string): Promise<TestCase> {
+    const id = testCase.testId
+
+    const existence: AxiosResponse<{testCases:TestCase[]}> = await axios.get(`https://taladro.duckdns.org/snippet/snippet/${snippetId}/test`, {
+        headers: {
+            Authorization: `Bearer ${this.token}`
+        }
+    });
+
+      const data = {
+          name: testCase.name,
+          inputs: testCase.inputs ? testCase.inputs : [],
+          outputs: testCase.outputs ? testCase.outputs : []
+      }
+
+      if (existence.data.testCases) {
+
+        const isAlreadyCreated = existence.data.testCases.map(t => t.testId).some(t => t === id);
+
+        if (isAlreadyCreated) {
+            const response = await axios.put(`https://taladro.duckdns.org/snippet/snippet/test/${id}`, data, {
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
+            });
+
+            return response.data;
+        }
+        else {
+            return await this.save(snippetId, data);
+        }
+
+    }
+    else {
+          return await this.save(snippetId, data);
+      }
   }
 
-  postTestCase(testCase: TestCase): Promise<TestCase> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.postTestCase(testCase)), DELAY)
-    })
+    private async save(snippetId: string, data: { outputs: string[]; inputs: string[]; name: string }) {
+        const response = await axios.post(`https://taladro.duckdns.org/snippet/snippet/${snippetId}/test`, data, {
+            headers: {
+                Authorization: `Bearer ${this.token}`
+            }
+        });
+        return response.data;
+    }
+
+    async removeTestCase(id: string): Promise<string> {
+    const response = await axios.delete(`https://taladro.duckdns.org/snippet/snippet/test/${id}`, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+
+    return response.data;
   }
 
-  removeTestCase(id: string): Promise<string> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.removeTestCase(id)), DELAY)
-    })
+  async testSnippet(test: TestCase, snipppetId: string): Promise<TestCaseResult> {
+    const data = {
+      name: test.name,
+      inputs: test.inputs,
+      outputs: test.outputs
+    }
+
+    const response = await axios.post(`https://taladro.duckdns.org/snippet/snippet/${snipppetId}/test/run`, data, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+
+    return response.data.isValid ? 'success' : 'fail';
   }
 
-  testSnippet(): Promise<TestCaseResult> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.testSnippet()), DELAY)
-    })
-  }
+  async deleteSnippet(id: string): Promise<string> {
+    const response = await axios.delete(`https://taladro.duckdns.org/snippet/snippet/${id}`, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
 
-  deleteSnippet(id: string): Promise<string> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.deleteSnippet(id)), DELAY)
-    })
+    return response.data;
   }
 
   getFileTypes(): Promise<FileType[]> {
@@ -115,15 +304,33 @@ export class FakeSnippetOperations implements SnippetOperations {
     })
   }
 
-  modifyFormatRule(newRules: Rule[]): Promise<Rule[]> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.modifyFormattingRule(newRules)), DELAY)
+  async modifyFormatRule(newRules: Rule[]): Promise<Rule[]> {
+    const dto = {
+        rules: newRules,
+        language: "printScript",
+        version: "1.1"
+    }
+    const response = await axios.put(`https://taladro.duckdns.org/snippet/format-rules`, dto, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
     })
+
+    return response.data;
   }
 
-  modifyLintingRule(newRules: Rule[]): Promise<Rule[]> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.modifyLintingRule(newRules)), DELAY)
+  async modifyLintingRule(newRules: Rule[]): Promise<Rule[]> {
+    const dto = {
+      rules: newRules,
+      language: "printScript",
+      version: "1.1"
+    }
+    const response = await axios.put(`https://taladro.duckdns.org/snippet/lint-rules`, dto, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
     })
+    console.log("hola")
+    return response.data;
   }
 }

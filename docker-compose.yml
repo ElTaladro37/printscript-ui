@@ -1,0 +1,26 @@
+services:
+  frontend:
+    container_name: "printscript-ui"
+    env_file:
+      - .env
+    build:
+      secrets:
+        - github_username
+        - github_token
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${EXTERNAL_APP_PORT}:80"
+    networks:
+      - app-network
+
+
+networks:
+  app-network:
+    driver: bridge
+
+secrets:
+  github_token:
+    environment: GITHUB_TOKEN
+  github_username:
+    environment: GITHUB_USERNAME

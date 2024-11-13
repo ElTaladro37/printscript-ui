@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {TestCase} from "../../types/TestCase.ts";
 import {Autocomplete, Box, Button, Chip, TextField, Typography} from "@mui/material";
 import {BugReport, Delete, Save} from "@mui/icons-material";
@@ -10,14 +10,16 @@ type TabPanelProps = {
     test?: TestCase;
     setTestCase: (test: Partial<TestCase>) => void;
     removeTestCase?: (testIndex: string) => void;
+    snippetId: string;
 }
 
-export const TabPanel = ({value, index, test: initialTest, setTestCase, removeTestCase}: TabPanelProps) => {
+export const TabPanel = ({snippetId, value, index, test: initialTest, setTestCase, removeTestCase}: TabPanelProps) => {
     const [testData, setTestData] = useState<Partial<TestCase> | undefined>(initialTest);
 
     const {mutateAsync: testSnippet, data} = useTestSnippet();
 
-
+    useEffect(() => {
+    }, [testData, testSnippet]);
     return (
         <div
             role="tabpanel"
@@ -40,8 +42,8 @@ export const TabPanel = ({value, index, test: initialTest, setTestCase, removeTe
                             size="small"
                             id="tags-filled"
                             freeSolo
-                            value={testData?.input ?? []}
-                            onChange={(_, value) => setTestData({...testData, input: value})}
+                            value={testData?.inputs ?? []}
+                            onChange={(_, value) => setTestData({...testData, inputs: value})}
                             renderTags={(value: readonly string[], getTagProps) =>
                                 value.map((option: string, index: number) => (
                                     <Chip variant="outlined" label={option} {...getTagProps({index})} />
@@ -62,8 +64,8 @@ export const TabPanel = ({value, index, test: initialTest, setTestCase, removeTe
                             size="small"
                             id="tags-filled"
                             freeSolo
-                            value={testData?.output ?? []}
-                            onChange={(_, value) => setTestData({...testData, output: value})}
+                            value={testData?.outputs ?? []}
+                            onChange={(_, value) => setTestData({...testData, outputs: value})}
                             renderTags={(value: readonly string[], getTagProps) =>
                                 value.map((option: string, index: number) => (
                                     <Chip variant="outlined" label={option} {...getTagProps({index})} />
@@ -79,8 +81,8 @@ export const TabPanel = ({value, index, test: initialTest, setTestCase, removeTe
                     </Box>
                     <Box display="flex" flexDirection="row" gap={1}>
                         {
-                            (testData?.id && removeTestCase) && (
-                            <Button onClick={() => removeTestCase(testData?.id ?? "")} variant={"outlined"} color={"error"}
+                            (testData?.testId && removeTestCase) && (
+                            <Button onClick={() => removeTestCase(testData?.testId ?? "")} variant={"outlined"} color={"error"}
                                     startIcon={<Delete/>}>
                                 Remove
                             </Button>)
@@ -88,7 +90,7 @@ export const TabPanel = ({value, index, test: initialTest, setTestCase, removeTe
                         <Button disabled={!testData?.name} onClick={() => setTestCase(testData ?? {})} variant={"outlined"} startIcon={<Save/>}>
                             Save
                         </Button>
-                        <Button onClick={() => testSnippet(testData ?? {})} variant={"contained"} startIcon={<BugReport/>}
+                        <Button onClick={() => testSnippet({tc: testData ?? {}, snippetId})} variant={"contained"} startIcon={<BugReport/>}
                                 disableElevation>
                             Test
                         </Button>

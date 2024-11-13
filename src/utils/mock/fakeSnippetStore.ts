@@ -6,9 +6,9 @@ import {TestCaseResult} from "../queries.tsx";
 import {FileType} from "../../types/FileType.ts";
 import {Rule} from "../../types/Rule.ts";
 
-const INITIAL_SNIPPETS: Snippet[] = [
+/*const INITIAL_SNIPPETS: Snippet[] = [
   {
-    id: '9af91631-cdfc-4341-9b8e-3694e5cb3672',
+    id: 'b8261834-1b60-45ca-a2d1-86e9ca279b30',
     name: 'Super Snippet',
     content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
     compliance: 'pending',
@@ -33,8 +33,17 @@ const INITIAL_SNIPPETS: Snippet[] = [
     author: 'John Doe',
     language: 'printscript',
     extension: 'prs'
+  },
+  {
+    id: '006ddf0b-e427-4328-9e0b-c9620207ce15',
+    name: 'real snippet',
+    content: 'let a : number = 5;\nlet b : number = 5;\n\nprintln(a + b);',
+    compliance: 'compliant',
+    author: 'John Doe',
+    language: 'printscript',
+    extension: 'prs'
   }
-]
+]*/
 
 const paginatedUsers: PaginatedUsers = {
   count: 5,
@@ -125,22 +134,22 @@ const INITIAL_LINTING_RULES: Rule[] = [
 
 const fakeTestCases: TestCase[] = [
   {
-    id: uuid(),
+    testId: uuid(),
     name: "Test Case 1",
-    input: ["A", "B"],
-    output: ["C", "D"]
+    inputs: ["A", "B"],
+    outputs: ["C", "D"]
   },
   {
-    id: uuid(),
+    testId: uuid(),
     name: "Test Case 2",
-    input: ["E", "F"],
-    output: ["G", "H"]
+    inputs: ["E", "F"],
+    outputs: ["G", "H"]
   },
 ]
 
 const fileTypes: FileType[] = [
   {
-    language: "printscript",
+    language: "printScript",
     extension: "prs",
   },
   {
@@ -164,12 +173,9 @@ export class FakeSnippetStore {
   private lintingRules: Rule[] = [];
 
   constructor() {
-    INITIAL_SNIPPETS.forEach(snippet => {
-      this.snippetMap.set(snippet.id, snippet)
-    })
 
     fakeTestCases.forEach(testCase => {
-      this.testCaseMap.set(testCase.id, testCase)
+      this.testCaseMap.set(testCase.testId, testCase)
     })
     this.formattingRules = INITIAL_FORMATTING_RULES
     this.lintingRules = INITIAL_LINTING_RULES
@@ -180,14 +186,14 @@ export class FakeSnippetStore {
   }
 
   createSnippet(createSnippet: CreateSnippet): Snippet {
-    const id = uuid();
+    const snippetId = uuid();
     const newSnippet = {
-      id,
+      snippetId,
       compliance: 'compliant' as ComplianceEnum,
       author: 'yo',
       ...createSnippet
     }
-    this.snippetMap.set(id, newSnippet)
+    this.snippetMap.set(snippetId, newSnippet)
 
     return newSnippet
   }
@@ -237,8 +243,8 @@ export class FakeSnippetStore {
   }
 
   postTestCase(testCase: Partial<TestCase>): TestCase {
-    const id = testCase.id ?? uuid()
-    const newTestCase = {...testCase, id} as TestCase
+    const id = testCase.testId ?? uuid()
+    const newTestCase = {...testCase, testId: id} as TestCase
     this.testCaseMap.set(id,newTestCase)
     return newTestCase
   }

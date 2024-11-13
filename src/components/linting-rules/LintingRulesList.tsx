@@ -18,21 +18,26 @@ const LintingRulesList = () => {
   const {data, isLoading} = useGetLintingRules();
   const {mutateAsync, isLoading: isLoadingMutate} = useModifyLintingRules({
     onSuccess: () => queryClient.invalidateQueries('lintingRules')
-  })
+  });
 
   useEffect(() => {
-    setRules(data)
+    console.log("data",data)
+    if (Array.isArray(data)) {
+      setRules(data);
+    } else {
+      setRules([]);
+    }
   }, [data]);
 
   const handleValueChange = (rule: Rule, newValue: string | number) => {
     const newRules = rules?.map(r => {
       if (r.name === rule.name) {
-        return {...r, value: newValue}
+        return {...r, value: newValue};
       } else {
         return r;
       }
-    })
-    setRules(newRules)
+    });
+    setRules(newRules);
   };
 
   const handleNumberChange = (rule: Rule) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,54 +48,59 @@ const LintingRulesList = () => {
   const toggleRule = (rule: Rule) => () => {
     const newRules = rules?.map(r => {
       if (r.name === rule.name) {
-        return {...r, isActive: !r.isActive}
+        return {...r, isActive: !r.isActive};
       } else {
         return r;
       }
-    })
-    setRules(newRules)
-  }
+    });
+    setRules(newRules);
+  };
+
+  const handleSave = async () => {
+    if (rules) {
+      await mutateAsync(rules);
+    }
+  };
 
   return (
-    <Card style={{padding: 16, margin: 16}}>
-      <Typography variant={"h6"}>Linting rules</Typography>
-      <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-        {
-          isLoading || isLoadingMutate ?  <Typography style={{height: 80}}>Loading...</Typography> :
-          rules?.map((rule) => {
-          return (
-            <ListItem
-              key={rule.name}
-              disablePadding
-              style={{height: 40}}
-            >
-              <Checkbox
-                edge="start"
-                checked={rule.isActive}
-                disableRipple
-                onChange={toggleRule(rule)}
-              />
-              <ListItemText primary={rule.name} />
-              {typeof rule.value === 'number' ?
-                (<TextField
-                  type="number"
-                  variant={"standard"}
-                  value={rule.value}
-                  onChange={handleNumberChange(rule)}
-                />) : typeof rule.value === 'string' ?
-                  (<TextField
-                    variant={"standard"}
-                    value={rule.value}
-                    onChange={e => handleValueChange(rule, e.target.value)}
-                  />) : null
-              }
-            </ListItem>
-          )
-        })}
-      </List>
-      <Button disabled={isLoading} variant={"contained"} onClick={() => mutateAsync(rules ?? [])}>Save</Button>
-    </Card>
-
+      <Card style={{padding: 16, margin: 16}}>
+        <Typography variant={"h6"}>Linting rules</Typography>
+        <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+          {
+            isLoading || isLoadingMutate ?  <Typography style={{height: 80}}>Loading...</Typography> :
+                rules?.map((rule) => {
+                  return (
+                      <ListItem
+                          key={rule.name}
+                          disablePadding
+                          style={{height: 40}}
+                      >
+                        <Checkbox
+                            edge="start"
+                            checked={rule.isActive}
+                            disableRipple
+                            onChange={toggleRule(rule)}
+                        />
+                        <ListItemText primary={rule.name} />
+                        {typeof rule.value === 'number' ?
+                            (<TextField
+                                type="number"
+                                variant={"standard"}
+                                value={rule.value}
+                                onChange={handleNumberChange(rule)}
+                            />) : typeof rule.value === 'string' ?
+                                (<TextField
+                                    variant={"standard"}
+                                    value={rule.value}
+                                    onChange={e => handleValueChange(rule, e.target.value)}
+                                />) : null
+                        }
+                      </ListItem>
+                  )
+                })}
+        </List>
+        <Button disabled={isLoading || isLoadingMutate} variant={"contained"} onClick={handleSave}>Save</Button>
+      </Card>
   );
 };
 
