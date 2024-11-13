@@ -195,10 +195,14 @@ console.error(params)
       }
   }
 
-  formatSnippet(snippetContent: string): Promise<string> {
-    return new Promise(resolve => {
-      setTimeout(() => resolve(this.fakeStore.formatSnippet(snippetContent)), DELAY)
-    })
+  async formatSnippet(snippetId: string): Promise<string> {
+      const resposne = await axios.patch(`https://taladro.duckdns.org/snippet/format-rules/format/${snippetId}`, {
+            headers: {
+                Authorization: `Bearer ${this.token}`
+            }
+      })
+      console.log(resposne.data)
+      return resposne.data;
   }
 
   async getTestCases(snippetId: string): Promise<TestCase[]> {
