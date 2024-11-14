@@ -28,7 +28,7 @@ export class FakeSnippetOperations implements SnippetOperations {
       snippetFile: createSnippet.content
     };
 
-    const response = await axios.post('https://taladro.duckdns.org/snippet/snippet/text', data, {
+    const response = await axios.post('https://talagod.duckdns.org/snippet/snippet/text', data, {
       headers: {
         Authorization: `Bearer ${this.token }`
       }
@@ -40,7 +40,7 @@ export class FakeSnippetOperations implements SnippetOperations {
 
   async getSnippetById(id: string): Promise<Snippet | undefined> {
 
-    const response = await axios.get(`https://taladro.duckdns.org/snippet/snippet/${id}`, {
+    const response = await axios.get(`https://talagod.duckdns.org/snippet/snippet/${id}`, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
@@ -63,7 +63,7 @@ export class FakeSnippetOperations implements SnippetOperations {
                 params.name = name;
             }
 console.error(params)
-            const response = await axios.get('https://taladro.duckdns.org/snippet/snippets/all', {
+            const response = await axios.get('https://talagod.duckdns.org/snippet/snippets/all', {
                 params: params,
                 headers: {
                     Authorization: `Bearer ${this.token}`
@@ -104,7 +104,7 @@ console.error(params)
       description: "esto nose que es"
     }
 
-    const response = await axios.put(`https://taladro.duckdns.org/snippet/snippet/${id}/text`, data, {
+    const response = await axios.put(`https://talagod.duckdns.org/snippet/snippet/${id}/text`, data, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
@@ -115,7 +115,7 @@ console.error(params)
 
   async getUserFriends(name: string = "", page: number = 1, pageSize: number = 10): Promise<PaginatedUsers> {
       try {
-          const response = await axios.get('https://taladro.duckdns.org/snippet/user', {
+          const response = await axios.get('https://talagod.duckdns.org/snippet/user', {
               params: {
                   page: page - 1,
                   size: pageSize,
@@ -148,7 +148,7 @@ console.error(params)
   async shareSnippet(snippetId: string, receiverId: string): Promise<Snippet> {
       try {
           const response = await axios.post(
-              `https://taladro.duckdns.org/snippet/snippet/${snippetId}/share`,
+              `https://talagod.duckdns.org/snippet/snippet/${snippetId}/share`,
               receiverId,
               {headers: {
                   Authorization: `Bearer ${this.token}`,
@@ -167,7 +167,7 @@ console.error(params)
   async getFormatRules(): Promise<Rule[]> {
       try {
           const response = await axios.get(
-                'https://taladro.duckdns.org/snippet/format-rules/printScript/1.1',
+                'https://talagod.duckdns.org/snippet/format-rules/printScript/1.1',
                 {headers: {Authorization: `Bearer ${this.token}`}}
           )
           console.log("format rules: ", response.data)
@@ -183,7 +183,7 @@ console.error(params)
       console.log("llego")
       try {
           const response = await axios.get(
-              'https://taladro.duckdns.org/snippet/lint-rules/printScript/1.1',
+              'https://talagod.duckdns.org/snippet/lint-rules/printScript/1.1',
               {headers: {Authorization: `Bearer ${this.token}`}}
           )
           console.log("linting rules: ", response.data)
@@ -196,7 +196,7 @@ console.error(params)
   }
 
   async formatSnippet(snippetId: string): Promise<string> {
-    const response = await axios.patch(`https://taladro.duckdns.org/snippet/format-rules/format/${snippetId}`, {}, {
+    const response = await axios.patch(`https://talagod.duckdns.org/snippet/format-rules/format/${snippetId}`, {}, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
@@ -206,7 +206,7 @@ console.error(params)
   }
 
   async getTestCases(snippetId: string): Promise<TestCase[]> {
-    const response = await axios.get(`https://taladro.duckdns.org/snippet/snippet/${snippetId}/test`, {
+    const response = await axios.get(`https://talagod.duckdns.org/snippet/snippet/${snippetId}/test`, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
@@ -218,7 +218,7 @@ console.error(params)
   async postTestCase(testCase: TestCase, snippetId: string): Promise<TestCase> {
     const id = testCase.testId
 
-    const existence: AxiosResponse<{testCases:TestCase[]}> = await axios.get(`https://taladro.duckdns.org/snippet/snippet/${snippetId}/test`, {
+    const existence: AxiosResponse<{testCases:TestCase[]}> = await axios.get(`https://talagod.duckdns.org/snippet/snippet/${snippetId}/test`, {
         headers: {
             Authorization: `Bearer ${this.token}`
         }
@@ -235,7 +235,7 @@ console.error(params)
         const isAlreadyCreated = existence.data.testCases.map(t => t.testId).some(t => t === id);
 
         if (isAlreadyCreated) {
-            const response = await axios.put(`https://taladro.duckdns.org/snippet/snippet/test/${id}`, data, {
+            const response = await axios.put(`https://talagod.duckdns.org/snippet/snippet/test/${id}`, data, {
                 headers: {
                     Authorization: `Bearer ${this.token}`
                 }
@@ -254,7 +254,7 @@ console.error(params)
   }
 
     private async save(snippetId: string, data: { outputs: string[]; inputs: string[]; name: string }) {
-        const response = await axios.post(`https://taladro.duckdns.org/snippet/snippet/${snippetId}/test`, data, {
+        const response = await axios.post(`https://talagod.duckdns.org/snippet/snippet/${snippetId}/test`, data, {
             headers: {
                 Authorization: `Bearer ${this.token}`
             }
@@ -263,7 +263,7 @@ console.error(params)
     }
 
     async removeTestCase(id: string): Promise<string> {
-    const response = await axios.delete(`https://taladro.duckdns.org/snippet/snippet/test/${id}`, {
+    const response = await axios.delete(`https://talagod.duckdns.org/snippet/snippet/test/${id}`, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
@@ -279,7 +279,7 @@ console.error(params)
       outputs: test.outputs
     }
 
-    const response = await axios.post(`https://taladro.duckdns.org/snippet/snippet/${snipppetId}/test/run`, data, {
+    const response = await axios.post(`https://talagod.duckdns.org/snippet/snippet/${snipppetId}/test/run`, data, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
@@ -289,7 +289,7 @@ console.error(params)
   }
 
   async deleteSnippet(id: string): Promise<string> {
-    const response = await axios.delete(`https://taladro.duckdns.org/snippet/snippet/${id}`, {
+    const response = await axios.delete(`https://talagod.duckdns.org/snippet/snippet/${id}`, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
@@ -310,7 +310,7 @@ console.error(params)
         language: "printScript",
         version: "1.1"
     }
-    const response = await axios.put(`https://taladro.duckdns.org/snippet/format-rules`, dto, {
+    const response = await axios.put(`https://talagod.duckdns.org/snippet/format-rules`, dto, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
@@ -325,7 +325,7 @@ console.error(params)
       language: "printScript",
       version: "1.1"
     }
-    const response = await axios.put(`https://taladro.duckdns.org/snippet/lint-rules`, dto, {
+    const response = await axios.put(`https://talagod.duckdns.org/snippet/lint-rules`, dto, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
